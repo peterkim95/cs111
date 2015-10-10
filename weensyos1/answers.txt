@@ -23,6 +23,12 @@ if the current process's wait_pid is present (i.e. not NULL). If it is present, 
 process state to P_RUNNABLE to allow the scheduler to run it, and pass the returning exit status of
 the current process to the the eax register of the waiting process (wait_pid).
 
+Response to Excercise 4:
+In the implementation for INT_SYS_WAIT, in the case the current process is a zombie
+process (i.e. been finished), one must free process by setting its state to P_STATE, so
+that it can be reused again by leftover processes.
+
+
 Anything else you'd like us to know:
 
 
