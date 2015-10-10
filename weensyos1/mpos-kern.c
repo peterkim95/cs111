@@ -239,7 +239,7 @@ do_fork(process_t *parent)
 	//                What should sys_fork() return to the child process?)
 	// You need to set one other process descriptor field as well.
 	// Finally, return the child's process ID to the parent.
-	pid_t process_id = 1
+	pid_t process_id = 1;
 	process_t *process;
 	while(process_id < NPROCS)
 	{
