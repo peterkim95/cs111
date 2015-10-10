@@ -208,6 +208,11 @@ interrupt(registers_t *reg)
 		schedule();
 	}
 
+	case INT_SYS_NEWTHREAD: {
+		current->p_registers.reg_eax = new_thread(current, current->p_registers.reg_eax);
+		run(current);
+	}
+
 	default:
 		while (1)
 			/* do nothing */;
@@ -233,6 +238,7 @@ interrupt(registers_t *reg)
  *****************************************************************************/
 
 static void copy_stack(process_t *dest, process_t *src);
+static pid_t new_thread(process_t *parent, int start_func);
 
 static pid_t
 do_fork(process_t *parent)
@@ -255,7 +261,7 @@ do_fork(process_t *parent)
 	// You need to set one other process descriptor field as well.
 	// Finally, return the child's process ID to the parent.
 	pid_t process_id = 1;
-	process_t *process;
+	process_t* process;
 	while(process_id < NPROCS)
 	{
 		process = &proc_array[process_id];
@@ -339,7 +345,25 @@ copy_stack(process_t *dest, process_t *src)
 	return;
 }
 
-
+static pid_t new_thread(process_t *parent, int start_func)
+{
+	pid_t process_id = 1;
+	process_t *process;
+	while(process_id < NPROCS)
+	{
+		process = &proc_array[process_id];
+		if(process->p_state == P_EMPTY)
+		{
+			process->p_registers = parent->p_registers;
+			proc->p_registers.reg_eip = start_func;
+			process->p_state = P_RUNNABLE;
+			process->p_registers.reg_eax = 0;
+			return process_id;
+		}
+		process_id++;
+	}
+	return -1;
+}
 
 /*****************************************************************************
  * schedule

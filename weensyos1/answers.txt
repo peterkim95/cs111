@@ -9,8 +9,10 @@ No. The sys_getpid() call returns a specific value in the %eax register from the
 pid. But the schedule() call can overwrite the %eax register with a different process's pid as it
 iterates through other processes, and searches for the first runnable process.
 
+
 Response to Exercise 2:
 See implementation of copy_stack and do_fork in mpos-kern.c
+
 
 Response to Exercise 3:
 First, we add an additional field to the process structure, which will be a pointer to the
@@ -23,14 +25,46 @@ if the current process's wait_pid is present (i.e. not NULL). If it is present, 
 process state to P_RUNNABLE to allow the scheduler to run it, and pass the returning exit status of
 the current process to the the eax register of the waiting process (wait_pid).
 
-Response to Excercise 4:
+
+Response to Exercise 4:
 In the implementation for INT_SYS_WAIT, in the case the current process is a zombie
 process (i.e. been finished), one must free process by setting its state to P_STATE, so
 that it can be reused again by leftover processes.
 
-
 Anything else you'd like us to know:
 
-
-
 Extra credit exercises:
+
+Response to Exercise 5:
+void start(void)
+{
+  int x = 0; // this local variable x lives on the stack
+  int * volatile pointer = &x; //here, a volatile pointer to a non volatile integer, which originally
+  // points to the parent process's x
+
+  pid_t p = sys_fork();
+  if(p == 0){
+    // In the child process
+    pointer = &x; //set the pointer to point to parent's process var x
+    *pointer = 1; //set whatever this is pointing to (either parent or child) to 1
+    x = 1; //Ideally, the *pointer = 1 should have only affected the parent's x. And thus, this
+    // assignment should not affect the child's x, signifying there was good process isolation.
+  }else if (p>0){
+    sys_wait(p);
+  }
+  app_printf("%d", x); // Expect 11 when bad process isolation executed, 10 for good process isolation.
+  sys_exit(0);
+}
+
+
+Response to Exercise 6:
+First, one defines a new system call called INT_SYS_NEWTHREAD and implements it in the interrupt
+function alongside other previous system calls. Before however, one implements the
+system call itself in mpos-app.h in sys_newthread() as instructed in the minilab specs, where the
+eax register is used to hold pointer to the start function. Consequently, to create the new thread
+the new_thread function is used, in which, instead of copyig the current process's stack,
+the thread's instruction pointer (eip) is set to the given start_func. Otherwise, it is identical
+in setting up as do_fork().
+
+
+Response to Exercise 7:

@@ -17,6 +17,17 @@
  *
  *****************************************************************************/
 
+static inline pid_t sys_newthread(void (*start_function)(void))
+{
+	pid_t thread_pid;
+	asm volatile("int %1\n"
+									: "=a" (thread_pid)
+									: "i" (INT_SYS_NEWTHREAD),
+										"a" (start_function)
+									: "cc", "memory");
+
+	return thread_pid;
+}
 
 /*****************************************************************************
  * sys_getpid
