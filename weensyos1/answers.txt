@@ -13,6 +13,15 @@ Response to Exercise 2:
 See implementation of copy_stack and do_fork in mpos-kern.c
 
 Response to Exercise 3:
+First, we add an additional field to the process structure, which will be a pointer to the
+process that is waiting for. Then, in the implementation of INT_SYS_WAIT, if the current process is
+suppose to wait, set it the wait_pid pointer of the calling process p. Afterwards, one sets that
+current process's state to P_BLOCKED, putting it to sleep.
+
+In addition, in the implementation of INT_SYS_EXIT, while the current process is exiting, it checks
+if the current process's wait_pid is present (i.e. not NULL). If it is present, then change its
+process state to P_RUNNABLE to allow the scheduler to run it, and pass the returning exit status of
+the current process to the the eax register of the waiting process (wait_pid).
 
 Anything else you'd like us to know:
 

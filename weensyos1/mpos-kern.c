@@ -76,6 +76,7 @@ start(void)
 	for (i = 0; i < NPROCS; i++) {
 		proc_array[i].p_pid = i;
 		proc_array[i].p_state = P_EMPTY;
+		proc_arrayp[i].p_wait = NULL
 	}
 
 	// The first process has process ID 1.
@@ -170,6 +171,14 @@ interrupt(registers_t *reg)
 		// for this register out of 'current->p_registers'.
 		current->p_state = P_ZOMBIE;
 		current->p_exit_status = current->p_registers.reg_eax;
+
+		if (current->p_wait != NULL)
+		{
+			current->p_wait->p_state = P_RUNNABLE;
+			current->p_wait->p_registers.reg_eax = current->p_exit_status;
+			current->p_state = P_EMPTY;
+		}
+
 		schedule();
 
 	case INT_SYS_WAIT: {
@@ -187,9 +196,15 @@ interrupt(registers_t *reg)
 		    || proc_array[p].p_state == P_EMPTY)
 			current->p_registers.reg_eax = -1;
 		else if (proc_array[p].p_state == P_ZOMBIE)
+		{
 			current->p_registers.reg_eax = proc_array[p].p_exit_status;
+			proc_array[p].p_state = P_EMPTY;
+		}
 		else
-			current->p_registers.reg_eax = WAIT_TRYAGAIN;
+		{
+			proc_array[p].p_wait = current;
+			curent->p_state = P_BLOCKED;
+		}
 		schedule();
 	}
 
