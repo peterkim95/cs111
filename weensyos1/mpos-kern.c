@@ -126,6 +126,7 @@ start(void)
  *****************************************************************************/
 
 static pid_t do_fork(process_t *parent);
+static pid_t new_thread(process_t *parent, int start_func);
 
 void
 interrupt(registers_t *reg)
@@ -238,7 +239,6 @@ interrupt(registers_t *reg)
  *****************************************************************************/
 
 static void copy_stack(process_t *dest, process_t *src);
-static pid_t new_thread(process_t *parent, int start_func);
 
 static pid_t
 do_fork(process_t *parent)
