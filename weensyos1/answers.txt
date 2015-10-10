@@ -68,3 +68,12 @@ in setting up as do_fork().
 
 
 Response to Exercise 7:
+Similar to exercise 6, one first defines a new system call named INT_SYS_KILL. In mpos-app.h, the sys_kill()
+function, as indicated in the minilab spec, is implemented by setting the eax register to the given pid in
+the parameter to kill. In the interrupt function, the case for INT_SYS_KILL is implemented by checking if the
+target process's state is not P_ZOMBIE (i.e. ready to be killed), and kills it. This is done by the standard
+exit operations similar to the case of INT_SYS_EXIT. The difference is that it forces the current process's
+return value (eax register) to 0 to signify a successful completion.
+
+Finally, one modified the run_child() function in the mpos-app2.c file so that for every even number
+processes, one iterates from the start of all pids to kills each odd number processes.  

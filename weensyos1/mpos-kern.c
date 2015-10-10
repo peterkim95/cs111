@@ -214,6 +214,32 @@ interrupt(registers_t *reg)
 		run(current);
 	}
 
+	case INT_SYS_KLL: {
+		pid_t p = current->p_registers.reg_eax;
+		if (p <= 0 || p >= NPROCS || p == current->p_pid
+		    || proc_array[p].p_state == P_EMPTY)
+			current->p_registers.reg_eax = -1;
+		else if (proc_array[p].p_state != P_ZOMBIE)
+		{
+			proc_array[p].p_exit_status = -1;
+			proc_array[p].p_state = P_ZOMBIE;
+
+			if (proc_array[p].p_wait != NULL)
+			{
+				proc_array[p].p_wait->p_state = P_RUNNABLE;
+				proc_array[p].p_wait->p_registers.reg_eax = proc_array[p].p_exit_status;
+				proc_array[p].p_state = P_EMPTY;
+			}
+
+			current->p_registers.reg_eax = 0;
+		}
+		else
+		{
+			current->p_registers.reg_eax = 0;
+		}
+		run(current);
+	}
+
 	default:
 		while (1)
 			/* do nothing */;
