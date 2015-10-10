@@ -355,7 +355,7 @@ static pid_t new_thread(process_t *parent, int start_func)
 		if(process->p_state == P_EMPTY)
 		{
 			process->p_registers = parent->p_registers;
-			proc->p_registers.reg_eip = start_func;
+			process->p_registers.reg_eip = start_func;
 			process->p_state = P_RUNNABLE;
 			process->p_registers.reg_eax = 0;
 			return process_id;

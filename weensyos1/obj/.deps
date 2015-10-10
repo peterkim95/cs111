@@ -1,0 +1,4 @@
+obj/bootstart.o: bootstart.S
+obj/mpos-boot.o: mpos-boot.c x86.h types.h elf.h
+obj/mpos-kern.o: mpos-kern.c mpos-kern.h mpos.h types.h x86.h lib.h
+obj/mpos-int.o: mpos-int.S
