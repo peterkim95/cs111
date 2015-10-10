@@ -214,7 +214,7 @@ interrupt(registers_t *reg)
 		run(current);
 	}
 
-	case INT_SYS_KLL: {
+	case INT_SYS_KILL: {
 		pid_t p = current->p_registers.reg_eax;
 		if (p <= 0 || p >= NPROCS || p == current->p_pid
 		    || proc_array[p].p_state == P_EMPTY)
