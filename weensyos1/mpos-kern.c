@@ -239,16 +239,27 @@ do_fork(process_t *parent)
 	//                What should sys_fork() return to the child process?)
 	// You need to set one other process descriptor field as well.
 	// Finally, return the child's process ID to the parent.
-
+	pid_t process_id = 1
+	process_t *process;
+	while(process_id < NPROCS)
+	{
+		process = &proc_array[process_id];
+		if(process->p_state == P_EMPTY)
+		{
+			process->p_registers = parent->p_registers;
+			copy_stack(process, parent);
+			process->p_state = P_RUNNABLE;
+			process->p_registers.reg_eax = 0;
+			return process_id;
+		}
+		process_id++;
+	}
 	return -1;
 }
 
 static void
 copy_stack(process_t *dest, process_t *src)
 {
-	uint32_t src_stack_bottom, src_stack_top;
-	uint32_t dest_stack_bottom, dest_stack_top;
-
 	// YOUR CODE HERE!
 	// This function copies the 'src' process's stack into the 'dest'
 	// process's stack region.  Then it sets 'dest's stack pointer to
@@ -297,13 +308,20 @@ copy_stack(process_t *dest, process_t *src)
 	// We have done one for you.
 
 	// YOUR CODE HERE!
+	uint32_t src_stack_bottom, src_stack_top;
+	uint32_t dest_stack_bottom, dest_stack_top;
 
-	src_stack_top = 0 /* YOUR CODE HERE */;
+	pid_t pid_src = src->p_pid;
+	pid_t pid_dest = dest->p_pid;
+
+	src_stack_top = PROC1_STACK_ADDR + (pid_src * PROC_STACK_SIZE);
 	src_stack_bottom = src->p_registers.reg_esp;
-	dest_stack_top = 0 /* YOUR CODE HERE */;
-	dest_stack_bottom = 0 /* YOUR CODE HERE: calculate based on the
-				 other variables */;
-	// YOUR CODE HERE: memcpy the stack and set dest->p_registers.reg_esp
+	dest_stack_top = PROC1_STACK_ADDR + (pid_dest * PROC_STACK_SIZE);
+	dest_stack_bottom = dest_stack_top - (src_stack_top - src_stack_bottom);
+
+	dest->p_registers.reg_esp = dest_stack_bottom;
+	memcpy((void*) dest_stack_top, (void*) src_stack_top, (src_stack_top - src_stack_bottom));
+	return;
 }
 
 

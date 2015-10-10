@@ -5,8 +5,14 @@ UCLA ID: 204271299
 -------------------------------------------------------------------------------
 
 Response to Exercise 1:
+No. The sys_getpid() call returns a specific value in the %eax register from the current process's
+pid. But the schedule() call can overwrite the %eax register with a different process's pid as it
+iterates through other processes, and searches for the first runnable process.
 
+Response to Exercise 2:
+See implementation of copy_stack and do_fork in mpos-kern.c
 
+Response to Exercise 3:
 
 Anything else you'd like us to know:
 

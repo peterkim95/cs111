@@ -22,6 +22,9 @@ start(void)
 	app_printf("About to start a new process...\n");
 
 	p = sys_fork();
+
+	// sys_fork() returns 0 if child process, non-zero means parent process
+
 	if (p == 0)
 		run_child();
 	else if (p > 0) {
