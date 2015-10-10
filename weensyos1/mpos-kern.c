@@ -76,7 +76,7 @@ start(void)
 	for (i = 0; i < NPROCS; i++) {
 		proc_array[i].p_pid = i;
 		proc_array[i].p_state = P_EMPTY;
-		proc_arrayp[i].p_wait = NULL
+		proc_array[i].p_wait = NULL;
 	}
 
 	// The first process has process ID 1.
@@ -203,7 +203,7 @@ interrupt(registers_t *reg)
 		else
 		{
 			proc_array[p].p_wait = current;
-			curent->p_state = P_BLOCKED;
+			current->p_state = P_BLOCKED;
 		}
 		schedule();
 	}
