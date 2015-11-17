@@ -106,6 +106,9 @@ start(void)
 		// Initialize the process descriptor
 		special_registers_init(proc);
 
+		proc->p_count = 0;	// init #4b scheduling algorithm
+		proc->p_share = 1;
+
 		// Set ESP
 		proc->p_registers.reg_esp = stack_ptr;
 
@@ -217,11 +220,13 @@ interrupt(registers_t *reg)
 void
 schedule(void)
 {
+	int highest = INT_MAX;
 	pid_t pid = current->p_pid;
 
 	switch(scheduling_algorithm){
 		case 0:	// Round-Robin
-			while (1) {
+			while (1)
+			{
 				pid = (pid + 1) % NPROCS;
 
 				// Run the selected process, but skip
@@ -230,9 +235,11 @@ schedule(void)
 				if (proc_array[pid].p_state == P_RUNNABLE)
 					run(&proc_array[pid]);
 			}
+
 			break;
 		case 1: 	// strict priority scheduling: run highest priority procs that can be run
-			while (1){
+			while (1)
+			{
 				pid = 0;
 				for (; pid < NPROCS; pid++)
 				{
@@ -240,11 +247,53 @@ schedule(void)
 						run(&proc_array[pid]);
 				}
 			}
-			break;
-		case 2:
 
 			break;
-		case 3:
+		case 2:	//	pid-dependent priority scheduling
+			while (1)
+			{
+
+				pid_t i = 0;
+				for (; i < NPROCS; i++)
+				{
+					if (proc_array[i].p_state == P_RUNNABLE)
+					{
+						if (proc_array[i].p_priority < highest)
+							highest = proc_array[i].p_priority;
+					}
+				}
+
+				pid = (pid + 1) % NPROCS;	// for alternation between procs with same priority level
+				for (; pid < NPROCS; pid++)
+				{
+					if (proc_array[pid].p_state == P_RUNNABLE)
+					{
+						if (proc_array[pid].p_priority <= highest)
+							run(&proc_array[pid]);
+					}
+
+				}
+			}
+
+			break;
+		case 3:	// proportional-share scheduling
+			while (1)
+			{
+				if (proc_array[pid].p_state == P_RUNNABLE) {
+					if (proc_array[pid].p_run_t >= proc_array[pid].p_share)
+					{
+						proc_array[pid].p_count = 0;
+					}
+					else
+					{
+						proc_array[pid].p_count++;
+						run(&proc_array[pid]);
+					}
+				}
+
+				pid = (pid + 1) % NPROCS; // alternate like above
+			}
+
 
 			break;
 		default:
