@@ -1,13 +1,11 @@
-Name:
-UCLA ID:
-
-Collaborators:
+Name: Taek-Sang (Peter) Kim
+UCLA ID: 204271299
 
 -------------------------------------------------------------------------------
 
 Response to Exercise 1:
 
-The name of the scheduling algorithm is:
+The name of the scheduling algorithm is: round-robin
 
 
 (Exercise 2 is a coding exercise)
@@ -25,6 +23,11 @@ Average wait time for scheduling_algorithm 1:
 Exercise 4:
 
 Did you complete Exercise 4A, Exercise 4B, or both for extra credit?
+-> Completed Both
+
+4a)
+
+4b)
 
 
 Exercise 5:

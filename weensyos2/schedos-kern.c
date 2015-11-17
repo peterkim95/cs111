@@ -219,16 +219,37 @@ schedule(void)
 {
 	pid_t pid = current->p_pid;
 
-	if (scheduling_algorithm == 0)
-		while (1) {
-			pid = (pid + 1) % NPROCS;
+	switch(scheduling_algorithm){
+		case 0:	// Round-Robin
+			while (1) {
+				pid = (pid + 1) % NPROCS;
 
-			// Run the selected process, but skip
-			// non-runnable processes.
-			// Note that the 'run' function does not return.
-			if (proc_array[pid].p_state == P_RUNNABLE)
-				run(&proc_array[pid]);
-		}
+				// Run the selected process, but skip
+				// non-runnable processes.
+				// Note that the 'run' function does not return.
+				if (proc_array[pid].p_state == P_RUNNABLE)
+					run(&proc_array[pid]);
+			}
+			break;
+		case 1: 	// strict priority scheduling: run highest priority procs that can be run
+			while (1){
+				pid = 0;
+				for (; pid < NPROCS; pid++)
+				{
+					if (proc_array[pid].p_state == P_RUNNABLE)
+						run(&proc_array[pid]);
+				}
+			}
+			break;
+		case 2:
+
+			break;
+		case 3:
+
+			break;
+		default:
+			break;
+	}
 
 	// If we get here, we are running an unknown scheduling algorithm.
 	cursorpos = console_printf(cursorpos, 0x100, "\nUnknown scheduling algorithm %d\n", scheduling_algorithm);
