@@ -27,7 +27,8 @@ typedef struct process {
 	int p_priority; // Process priority; the lower the higher
 	int p_count;	// Process Run Times Count
 	int p_share;	// Process Sharing
-
+	int p_tickets; // Process share of tickets for #7 lottery algo
+	
 	registers_t p_registers;	// Current process state: registers,
 					// stack location, EIP, etc.
 					// 'registers_t' defined in x86.h

@@ -142,18 +142,22 @@ start(void)
 	proc_array[1].p_share	   = __SHARE_1__;
 	proc_array[1].p_count = __SHARE_1__;
 	proc_array[1].p_priority = __PRIORITY_1__;
+	proc_array[1].p_tickets = 200;
 
 	proc_array[2].p_share    = __SHARE_2__;
 	proc_array[2].p_count = __SHARE_2__;
 	proc_array[2].p_priority = __PRIORITY_2__;
+	proc_array[2].p_tickets = 250;
 
 	proc_array[3].p_share    = __SHARE_3__;
 	proc_array[3].p_count = __SHARE_3__;
 	proc_array[3].p_priority = __PRIORITY_3__;
+	proc_array[3].p_tickets = 450;
 
 	proc_array[4].p_share    = __SHARE_4__;
 	proc_array[4].p_count = __SHARE_4__;
 	proc_array[4].p_priority = __PRIORITY_4__;
+	proc_array[4].p_tickets = 100;
 
 	// Set up process descriptors (the proc_array[])
 	for (i = 1; i < NPROCS; i++) {
