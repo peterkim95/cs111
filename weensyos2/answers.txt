@@ -43,7 +43,7 @@ Exercise 5: From the given screenshot in the spec, the timer interrupt occurs at
 
 
 (Exercise 6 is a coding exercise)
-Race condition was resolved by implementing a new system call, named sys_print, that automatically prints to the console, acheiving
+Race condition was resolved by implementing a new system call, named sys_print, that is called in 'schedos-1.c' manually to achieve atomicity of the print instruction for each process.
 
 Anything else you'd like us to know:
 
@@ -51,6 +51,7 @@ Anything else you'd like us to know:
 
 Extra credit exercises: (Completed them all: exercise 7, 8, and both parts to 4)
 
-Exercise 7: Lottery scheduling is implemented.
+Exercise 7: I decided to implement a lottery scheduling algorithm. First, I created two new system calls called sys_incT & sys_decT to handle interrupts of increasing and decreasing the tickets of a given process. Consequently, I added a new integer member variable to the process structure, and named it p_tickets that denotes the number of tickets that the process holds on to. In addition, I define a tickets[] array to keep track of how many tickets each process holds onto. The more you hold on to, the higher the chance of "winning" the lottery, being selected by the chance-based algorithm to run. To simulate this kind of randomness, I implemented a psuedo-random number generator based on Linear-Feedback Shit Registers (referenced in schedos-kern.c above the random() function)
 
-Exercise 8:
+
+Exercise 8: First, I defined a new variable in the shared memory space by declaring it in schedos.h, identical to the cursorpos variable. Similarly, I defined a memory location for the new 'spin_lock' variable in schedos-symbols.id file. Finally, I employ this lock to solve the concurrency/race condition problem mentioned in Exercise 6, by simply calling the atomic_swap function (defined in 'x86sync.h'), and passing it in the 'spin_lock' variable.

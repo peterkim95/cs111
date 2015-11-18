@@ -96,7 +96,8 @@ static inline void sys_print(uint32_t character)
 }
 
 // EX 7: system calls for increasing/decreasing a ticket
-static inline void sys_incT(pid_t pid){
+static inline void sys_incT(pid_t pid)
+{
 	asm volatile("int %0\n" : : "i" (INT_SYS_INCT), "a" (pid) : "cc", "memory");
 }
 

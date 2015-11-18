@@ -19,14 +19,7 @@
 #endif
 
 // UNCOMMENT THE NEXT LINE TO USE EXERCISE 8 CODE INSTEAD OF EXERCISE 6
-// #define __EXERCISE_8__
-// Use the following structure to choose between them:
-// #infdef __EXERCISE_8__
-// (exercise 6 code)
-// #else
-// (exercise 8 code)
-// #endif
-
+#define __EXERCISE_8__
 
 void
 start(void)
@@ -35,7 +28,19 @@ start(void)
 
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.
-		*cursorpos++ = PRINTCHAR;
+		#infdef __EXERCISE_8__
+			// (exercise 6 code)
+			sys_print(PRINTCHAR);
+		#else
+			// (exercise 8 code)
+			// Implemented spinlock to remove race condition of printing for each process.
+			while (atomic_swap(&spin_lock, 1) != 0)
+				continue;
+
+			*cursorpos++ = PRINTCHAR;
+			atomic_swap(&spin_lock, 0);
+		#endif
+
 		sys_yield();
 	}
 	sys_exit(0);
