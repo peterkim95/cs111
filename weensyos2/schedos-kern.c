@@ -87,13 +87,15 @@ void increase_ticket(pid_t p)
 
 void decrease_ticket(pid_t p)
 {
+	// deleting in array
 	int i = 0;
 	for(; i <= cur_tcount; i++)
 	{
 		if(p == tickets[i])
 		{
 			int j = i;
-			for(; j < tix - 1; j++)
+			// shift every element over by 1
+			for(; j < cur_tcount - 1; j++)
 				tickets[j] = tickets[j+1];
 			cur_tcount--;
 			break;
