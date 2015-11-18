@@ -37,14 +37,20 @@ Did you complete Exercise 4A, Exercise 4B, or both for extra credit?
 -> Completed Both; see schedos-kern.c
 
 
-Exercise 5:
+Exercise 5: From the given screenshot in the spec, the timer interrupt occurs at process 1.
+
+1234 -> 1234 -> 1234 -> 234  // Process 1 does not successfully print.
 
 
 (Exercise 6 is a coding exercise)
-
+Race condition was resolved by implementing a new system call, named sys_print, that automatically prints to the console, acheiving
 
 Anything else you'd like us to know:
 
 
 
-Extra credit exercises:
+Extra credit exercises: (Completed them all: exercise 7, 8, and both parts to 4)
+
+Exercise 7: Lottery scheduling is implemented.
+
+Exercise 8:

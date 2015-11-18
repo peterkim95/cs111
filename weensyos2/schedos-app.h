@@ -85,7 +85,7 @@ static inline void sys_priority(int priority)
  *****************************************************************************/
 static inline void sys_share(int share)
 {
-	asm volatile("int %0\n": : "i" (INT_SYS_SHARE), "a" (share) : "cc", "memory");
+	asm volatile("int %0\n" : : "i" (INT_SYS_SHARE), "a" (share) : "cc", "memory");
 }
 
 
@@ -93,4 +93,14 @@ static inline void sys_share(int share)
 static inline void sys_print(uint32_t character)
 {
 	asm volatile("int %0\n" : : "i" (INT_SYS_PRINT), "a" (character) : "cc", "memory");
+}
+
+// EX 7: system calls for increasing/decreasing a ticket
+static inline void sys_incT(pid_t pid){
+	asm volatile("int %0\n" : : "i" (INT_SYS_INCT), "a" (pid) : "cc", "memory");
+}
+
+static inline void sys_decT(pid_t pid)
+{
+	asm volatile("int %0\n" : : "i" (INT_SYS_DECT),"a" (pid): "cc", "memory");
 }

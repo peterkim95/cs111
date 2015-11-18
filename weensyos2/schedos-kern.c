@@ -70,7 +70,46 @@ int scheduling_algorithm;
 #define __EXERCISE_2__   2  // strict priority scheduling (exercise 2)
 #define __EXERCISE_4A__ 41  // p_priority algorithm (exercise 4.a)
 #define __EXERCISE_4B__ 42  // p_share algorithm (exercise 4.b)
-#define __EXERCISE_7__   7  // any algorithm for exercise 7
+#define __EXERCISE_7__   7  // new algorithm for exercise 7
+
+
+// Lottery scheduling algoithm related ticket variables and methods:
+#define MAX_TICKETS	1000
+int cur_tcount = 0;
+
+pid_t tickets[MAX_TICKETS];
+
+void increase_ticket(pid_t p)
+{
+	if (cur_tcount < MAX_TICKETS)	// check ticket count stays under defined limit
+		tickets[cur_tcount++] = p;
+}
+
+void decrease_ticket(pid_t p)
+{
+	int i = 0;
+	for(; i <= cur_tcount; i++)
+	{
+		if(p == tickets[i])
+		{
+			int j = i;
+			for(; j < tix - 1; j++)
+				tickets[j] = tickets[j+1];
+			cur_tcount--;
+			break;
+		}
+	}
+}
+
+// rand() function to generate random
+
+unsigned random()
+{
+	unsigned lfsr = 0xACE1u;
+	unsigned bit;
+	bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+	return lfsr = (lfsr >> 1) | (bit << 15);
+}
 
 
 /*****************************************************************************
@@ -211,6 +250,14 @@ interrupt(registers_t *reg)
 			*cursorpos++ = reg->reg_eax;
 			run(current);
 
+	case INT_SYS_INCT:
+			increase_ticket(reg->reg_eax);
+			run(current);
+
+	case INT_SYS_DECT:
+			decrease_ticket(reg->reg_eax);
+			run(current);
+
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
 		// time quantum).
@@ -318,8 +365,15 @@ schedule(void)
 			}
 			break;
 
-		case __EXERCISE_7__:	// Personal Implementation
-
+		case __EXERCISE_7__:	// Lottery Implementation
+			while (1)
+			{
+				unsigned r;
+				r = random();
+				r = r % cur_tcount;
+				if (proc_array[tickets[r]].p_state == P_RUNNABLE)
+				 	run(&proc_array[tickets[r]]);
+			}
 			break;
 
 		default:break;
