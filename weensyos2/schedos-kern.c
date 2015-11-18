@@ -103,21 +103,16 @@ void decrease_ticket(pid_t p)
 	}
 }
 
-// random() function to generate random
+// random() function to generate random number for lottery picks
+// Based upon Linear-Feedback shift register to generate pseudorandom number
+// http://stackoverflow.com/questions/7602919/how-do-i-generate-random-numbers-without-rand-function
 
-unsigned t1 = 0, t2 = 0;
-
+unsigned short lfsr = 0xACE1u;
+unsigned bit;
 unsigned random()
 {
-    unsigned b;
-
-    b = t1 ^ (t1 >> 2) ^ (t1 >> 6) ^ (t1 >> 7);
-    t1 = (t1 >> 1) | (~b << 31);
-
-    b = (t2 << 1) ^ (t2 << 2) ^ (t1 << 3) ^ (t2 << 4);
-    t2 = (t2 << 1) | (~b >> 31);
-
-    return t1 ^ t2;
+	bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+	return lfsr = (lfsr >> 1) | (bit << 15);
 }
 
 
@@ -136,7 +131,7 @@ start(void)
 
 	// Set up hardware (schedos-x86.c)
 	segments_init();
-	interrupt_controller_init(0);
+	interrupt_controller_init(1); // 1 to enable, 0 to disable clock interrupts
 	console_clear();
 
 	// Initialize process descriptors as empty
@@ -174,8 +169,8 @@ start(void)
 		// Initialize the process descriptor
 		special_registers_init(proc);
 
-		proc->p_count = 0;	// init #4b scheduling algorithm
-		proc->p_share = 1;
+		//proc->p_count = 0;	// init #4b scheduling algorithm
+		//proc->p_share = 1;
 
 		// Set ESP
 		proc->p_registers.reg_esp = stack_ptr;
@@ -205,7 +200,7 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	scheduling_algorithm = 7;
+	scheduling_algorithm = 0;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -392,7 +387,8 @@ schedule(void)
 				unsigned r;
 				r = random();
 				r = r % cur_tcount;
-				run(&proc_array[tickets[r]]);
+				if (proc_array[tickets[r]].p_state == P_RUNNABLE)
+					run(&proc_array[tickets[r]]);
 			}
 			break;
 
