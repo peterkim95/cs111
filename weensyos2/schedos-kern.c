@@ -105,12 +105,19 @@ void decrease_ticket(pid_t p)
 
 // random() function to generate random
 
+unsigned t1 = 0, t2 = 0;
+
 unsigned random()
 {
-	unsigned lfsr = 0xACE1u;
-	unsigned bit;
-	bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
-	return lfsr = (lfsr >> 1) | (bit << 15);
+    unsigned b;
+
+    b = t1 ^ (t1 >> 2) ^ (t1 >> 6) ^ (t1 >> 7);
+    t1 = (t1 >> 1) | (~b << 31);
+
+    b = (t2 << 1) ^ (t2 << 2) ^ (t1 << 3) ^ (t2 << 4);
+    t2 = (t2 << 1) | (~b >> 31);
+
+    return t1 ^ t2;
 }
 
 
@@ -175,14 +182,14 @@ start(void)
 
 		// Load process and set EIP, based on ELF image
 		program_loader(i - 1, &proc->p_registers.reg_eip);
-		
+
 		int x = 0;
 		while (x < proc_array[i].p_tickets)
 		{
 			increase_ticket(proc_array[i].p_pid);
 			x++;
 		}
-			
+
 		// Mark the process as runnable!
 		proc->p_state = P_RUNNABLE;
 	}
@@ -274,7 +281,7 @@ interrupt(registers_t *reg)
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
 		// time quantum).
-	
+
 	// Switch to the next runnable process.
 		schedule();
 
