@@ -28,9 +28,12 @@ start(void)
 
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.
-		#infdef __EXERCISE_8__
+		
+		#ifndef __EXERCISE_8__
 			// (exercise 6 code)
 			sys_print(PRINTCHAR);
+		
+
 		#else
 			// (exercise 8 code)
 			// Implemented spinlock to remove race condition of printing for each process.

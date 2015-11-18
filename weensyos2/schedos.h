@@ -23,5 +23,5 @@
 // The current screen cursor position (stored at memory location 0x198000).
 
 extern uint16_t * volatile cursorpos;
-extern uint16_t spin_lock;
+extern uint32_t spin_lock;
 #endif
