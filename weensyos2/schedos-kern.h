@@ -24,6 +24,7 @@ typedef enum procstate {
 typedef struct process {
 	pid_t p_pid;			// Process ID
 
+	int p_priority; // Process priority; the lower the higher
 	int p_count;	// Process Run Times Count
 	int p_share;	// Process Sharing
 

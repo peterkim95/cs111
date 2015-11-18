@@ -71,6 +71,11 @@ sys_exit(int status)
  *
  *****************************************************************************/
 
+static inline void sys_priority(int priority)
+{
+	asm volatile("int %0\n": : "i" (INT_SYS_PRIORITY), "a" (priority) : "cc", "memory");
+}
+
 
 /*****************************************************************************
  * sys_share(???)
@@ -78,3 +83,14 @@ sys_exit(int status)
  *   IF YOU IMPLEMENT EXERCISE 4.B, NAME YOUR SYSTEM CALL sys_share .
  *
  *****************************************************************************/
+static inline void sys_share(int share)
+{
+	asm volatile("int %0\n": : "i" (INT_SYS_SHARE), "a" (share) : "cc", "memory");
+}
+
+
+// EX 6
+static inline void sys_print(uint32_t character)
+{
+	asm volatile("int %0\n" : : "i" (INT_SYS_PRINT), "a" (character) : "cc", "memory");
+}

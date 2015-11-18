@@ -52,18 +52,18 @@ int scheduling_algorithm;
 // UNCOMMENT THESE LINES IF YOU DO EXERCISE 4.A
 // Use these #defines to initialize your implementation.
 // Changing one of these lines should change the initialization.
-// #define __PRIORITY_1__ 1
-// #define __PRIORITY_2__ 2
-// #define __PRIORITY_3__ 3
-// #define __PRIORITY_4__ 4
+#define __PRIORITY_1__ 1
+#define __PRIORITY_2__ 2
+#define __PRIORITY_3__ 3
+#define __PRIORITY_4__ 4
 
 // UNCOMMENT THESE LINES IF YOU DO EXERCISE 4.B
 // Use these #defines to initialize your implementation.
 // Changing one of these lines should change the initialization.
-// #define __SHARE_1__ 1
-// #define __SHARE_2__ 2
-// #define __SHARE_3__ 3
-// #define __SHARE_4__ 4
+#define __SHARE_1__ 1
+#define __SHARE_2__ 2
+#define __SHARE_3__ 3
+#define __SHARE_4__ 4
 
 // USE THESE VALUES FOR SETTING THE scheduling_algorithm VARIABLE.
 #define __EXERCISE_1__   0  // the initial algorithm
@@ -97,6 +97,22 @@ start(void)
 		proc_array[i].p_pid = i;
 		proc_array[i].p_state = P_EMPTY;
 	}
+
+	proc_array[1].p_share	   = __SHARE_1__;
+	proc_array[1].p_runcount = __SHARE_1__;
+	proc_array[1].p_priority = __PRIORITY_1__;
+
+	proc_array[2].p_share    = __SHARE_2__;
+	proc_array[2].p_runcount = __SHARE_2__;
+	proc_array[2].p_priority = __PRIORITY_2__;
+
+	proc_array[3].p_share    = __SHARE_3__;
+	proc_array[3].p_runcount = __SHARE_3__;
+	proc_array[3].p_priority = __PRIORITY_3__;
+
+	proc_array[4].p_share    = __SHARE_4__;
+	proc_array[4].p_runcount = __SHARE_4__;
+	proc_array[4].p_priority = __PRIORITY_4__;
 
 	// Set up process descriptors (the proc_array[])
 	for (i = 1; i < NPROCS; i++) {
@@ -179,15 +195,21 @@ interrupt(registers_t *reg)
 		current->p_exit_status = reg->reg_eax;
 		schedule();
 
-	case INT_SYS_USER1:
+	case INT_SYS_PRIORITY:
 		// 'sys_user*' are provided for your convenience, in case you
 		// want to add a system call.
 		/* Your code here (if you want). */
+		current->p_priority = reg->reg_eax;
 		run(current);
 
-	case INT_SYS_USER2:
+	case INT_SYS_SHARE:
 		/* Your code here (if you want). */
+		current->p_share = reg->reg_eax;
 		run(current);
+
+	case INT_SYS_PRINT: // excercise 6
+			*cursorpos++ = reg->reg_eax;
+			run(current);
 
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
@@ -224,7 +246,7 @@ schedule(void)
 	pid_t pid = current->p_pid;
 
 	switch(scheduling_algorithm){
-		case 0:	// Round-Robin
+		case __EXERCISE_1__:	// Round-Robin
 			while (1)
 			{
 				pid = (pid + 1) % NPROCS;
@@ -237,7 +259,7 @@ schedule(void)
 			}
 
 			break;
-		case 1: 	// strict priority scheduling: run highest priority procs that can be run
+		case __EXERCISE_2__: 	// strict priority scheduling: run highest priority procs that can be run
 			while (1)
 			{
 				pid = 0;
@@ -249,7 +271,7 @@ schedule(void)
 			}
 
 			break;
-		case 2:	//	pid-dependent priority scheduling
+		case __EXERCISE_4A__:	//	pid-dependent priority scheduling
 			while (1)
 			{
 
@@ -276,28 +298,31 @@ schedule(void)
 			}
 
 			break;
-		case 3:	// proportional-share scheduling
+
+		case __EXERCISE_4B__:	// proportional-share scheduling
 			while (1)
 			{
 				if (proc_array[pid].p_state == P_RUNNABLE) {
-					if (proc_array[pid].p_run_t >= proc_array[pid].p_share)
-					{
-						proc_array[pid].p_count = 0;
-					}
-					else
+					if (proc_array[pid].p_count < proc_array[pid].p_share)
 					{
 						proc_array[pid].p_count++;
 						run(&proc_array[pid]);
+					}
+					else
+					{
+						proc_array[pid].p_count = 0;
 					}
 				}
 
 				pid = (pid + 1) % NPROCS; // alternate like above
 			}
+			break;
 
+		case __EXERCISE_7__:	// Personal Implementation
 
 			break;
-		default:
-			break;
+
+		default:break;
 	}
 
 	// If we get here, we are running an unknown scheduling algorithm.
