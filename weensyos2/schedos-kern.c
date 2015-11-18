@@ -75,7 +75,7 @@ int scheduling_algorithm;
 
 // Lottery scheduling algoithm related ticket variables and methods:
 #define MAX_TICKETS	1000
-int cur_tcount = 0;
+int cur_tcount;
 
 pid_t tickets[MAX_TICKETS];
 
@@ -103,7 +103,7 @@ void decrease_ticket(pid_t p)
 	}
 }
 
-// rand() function to generate random
+// random() function to generate random
 
 unsigned random()
 {
@@ -138,7 +138,7 @@ start(void)
 		proc_array[i].p_pid = i;
 		proc_array[i].p_state = P_EMPTY;
 	}
-
+	cur_tcount = 0;
 	proc_array[1].p_share	   = __SHARE_1__;
 	proc_array[1].p_count = __SHARE_1__;
 	proc_array[1].p_priority = __PRIORITY_1__;
@@ -175,7 +175,14 @@ start(void)
 
 		// Load process and set EIP, based on ELF image
 		program_loader(i - 1, &proc->p_registers.reg_eip);
-
+		
+		int x = 0;
+		while (x < proc_array[i].p_tickets)
+		{
+			increase_ticket(proc_array[i].p_pid);
+			x++;
+		}
+			
 		// Mark the process as runnable!
 		proc->p_state = P_RUNNABLE;
 	}
@@ -191,7 +198,7 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	scheduling_algorithm = 0;
+	scheduling_algorithm = 7;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -267,7 +274,8 @@ interrupt(registers_t *reg)
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
 		// time quantum).
-		// Switch to the next runnable process.
+	
+	// Switch to the next runnable process.
 		schedule();
 
 	default:
@@ -377,8 +385,7 @@ schedule(void)
 				unsigned r;
 				r = random();
 				r = r % cur_tcount;
-				if (proc_array[tickets[r]].p_state == P_RUNNABLE)
-				 	run(&proc_array[tickets[r]]);
+				run(&proc_array[tickets[r]]);
 			}
 			break;
 
